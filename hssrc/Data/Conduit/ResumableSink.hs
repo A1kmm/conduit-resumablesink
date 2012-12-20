@@ -54,12 +54,17 @@ closeResumableSink (ResumableSink sink) =
           Done r -> return r
           PipeM mp -> mp >>= go
 
+-- | Connects a source and a sink. The result will be Right a
+--   ResumableSink or Left result if the Sink completes.
 (+$$) :: Monad m => Source m i -> Sink i m r -> m (Either r (ResumableSink m i r))
 source +$$ sink = source `connectResumeSink` (newResumableSink sink)
 
+-- | Connects a new source to a resumable sink. The result will be Right an updated
+--   ResumableSink or Left result if the Sink completes.
 (++$$) :: Monad m => Source m i -> ResumableSink m i r -> m (Either r (ResumableSink m i r))
 (++$$) = connectResumeSink
 
+-- | Attaches a source to a resumable sink, finishing the sink and returning a result.
 (-++$$) :: Monad m => Source m i -> ResumableSink m i r -> m r
 source -++$$ (ResumableSink sink) = do
   r <- source $$ sink
