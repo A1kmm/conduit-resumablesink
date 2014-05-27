@@ -4,16 +4,17 @@ import qualified Data.Conduit.List as C
 import Data.Conduit.ResumableSink
 import Data.IORef
 import Control.Monad.IO.Class
+import Control.Monad.Trans.Resource as R
 
 main :: IO ()
 main = hspec $ describe "use resumable sink" $ do
     it "behaves like normal conduit when -++$$ used immediately" $ do
-      r <- C.runResourceT $
+      r <- R.runResourceT $
              C.sourceList ["hello", "world"] -++$$ newResumableSink C.consume
       r `shouldBe` ["hello", "world"]
 
     it "sink can be resumed" $ do
-      r <- C.runResourceT $ do
+      r <- R.runResourceT $ do
              Right r1 <- C.sourceList ["hello", "world"] +$$ C.consume
              C.sourceList ["hello", "world"] -++$$ r1
       r `shouldBe` ["hello", "world", "hello", "world"]
@@ -22,7 +23,7 @@ main = hspec $ describe "use resumable sink" $ do
       s <- newIORef (0 :: Int, 0 :: Int, 0 :: Int)
       let clean f _ = liftIO $ modifyIORef s f
       
-      r <- C.runResourceT $ do
+      r <- R.runResourceT $ do
              Right r1 <-
                 C.addCleanup (clean incA) (C.sourceList ["hello", "world"]) 
                    +$$ C.addCleanup (clean incC) C.consume
