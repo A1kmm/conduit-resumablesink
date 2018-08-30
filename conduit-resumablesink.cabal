@@ -1,5 +1,5 @@
 Name:          conduit-resumablesink
-Version:       0.2
+Version:       0.3
 Synopsis:      Allows conduit to resume sinks to feed multiple sources into it.
 Description:
     @conduit-resumablesink@ is a solution to the problem where you have a @conduit@
@@ -20,9 +20,10 @@ Library
   Exposed-modules: Data.Conduit.ResumableSink
   Build-depends: 
                  base >= 4 && < 5,
-                 conduit >= 1.2 && <1.3,
+                 conduit >= 1.2 && < 1.4,
                  void >= 0.6 && < 0.8
   ghc-options:     -Wall
+  extensions: CPP, PatternSynonyms, Rank2Types
 
 test-suite test
     hs-source-dirs: test
